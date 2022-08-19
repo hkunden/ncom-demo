@@ -1,8 +1,0 @@
-{
-    "extends": "@nui/eslint-config-javascript",
-    "ignorePatterns": [
-        "node_modules/",
-        "allure-report/",
-        "allure-results/"
-    ]
-}
