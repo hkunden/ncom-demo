@@ -5,7 +5,8 @@ import {
     SAFARI,
     CHROME,
     EDGE,
-    FIREFOX
+    FIREFOX,
+    IPHONE
 } from "./constants";
 
 const getElement = async (selector, options = {}) => {
@@ -35,9 +36,13 @@ const getBrowserName = async () => {
     return ((await browser.capabilities.browserName) || "").toLowerCase();
 };
 
-const getElementFromCollectionByIndex = async (value, selector) => {
+const getDeviceName = async () => {
+    return ((await browser.capabilities.deviceName) || "").toLowerCase();
+};
+
+const getElementFromCollectionByIndex = async (selector, index) => {
     const collection = await getElement(selector, {matchAll: true});
-    return collection[value];
+    return collection[index];
 };
 
 export default class BrowserActions {
@@ -88,7 +93,7 @@ export default class BrowserActions {
     }
 
     static async getElementCount(selector) {
-        return await (await getElement(selector, {matchAll: true})).length;
+        return await (await getElement(selector, {matchAll: true, waitForExist: false})).length;
     }
 
     static async mouseOverElement(selector, options = {}) {
@@ -129,6 +134,12 @@ export default class BrowserActions {
         return browser === FIREFOX;
     }
 
+    static async isDeviceIPhone() {
+        const browser = await getDeviceName() || "";
+
+        return browser.includes(IPHONE);
+    }
+
     static async pauseExecution(time = STANDARD_WAIT_TIME_MS) {
         await browser.pause(time);
     }
@@ -157,6 +168,12 @@ export default class BrowserActions {
 
     static async scrollToElement(selector) {
         await (await getElement(selector)).scrollIntoView();
+    }
+
+    static async scrollByPx(count, px) {
+        for (let i = 0; i < count; i++) {
+            await browser.execute(`window.scrollBy(0,${px});`);
+        }
     }
 
     static async setTextOnElement(selector, text = "") {
@@ -232,19 +249,34 @@ export default class BrowserActions {
         return (await getElement(selector)).getAttribute(attribute);
     }
 
+    static async getAttributeFromSelectorByIndex(selector, attribute, index) {
+        return (await getElementFromCollectionByIndex(selector, index)).getAttribute(attribute);
+    }
+
     static async switchToTab(tab) {
         return browser.switchWindow(tab);
     }
 
-    static async clickOnElementByIndex(value, selector, options = {}) {
-        const element = await getElementFromCollectionByIndex(value, selector);
+    static async clickOnElementByIndex(selector, index, options = {}) {
+        const element = await getElementFromCollectionByIndex(selector, index);
         await this.pauseExecution(200);
         await element.click(options);
     }
 
-    static async clickOnElementByIndexMobile(value, selector) {
-        const element = await getElementFromCollectionByIndex(value, selector);
+    static async scrollToElementByIndex(selector, index) {
+        const element = await getElementFromCollectionByIndex(selector, index);
+        await this.pauseExecution(200);
+        await this.scrollToElement(element);
+    }
+
+    static async clickOnElementByIndexMobile(selector, index) {
+        const element = await getElementFromCollectionByIndex(selector, index);
         await this.pauseExecution(200);
         await element.click();
+    }
+
+    static async getRandomGWPBrandTitle(selector, index) {
+        const element = await getElementFromCollectionByIndex(selector, index);
+        return (element).getText();
     }
 }

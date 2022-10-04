@@ -12,19 +12,18 @@ let overrides = {
     capabilities: [
         {
             "bstack:options": {
-                "deviceName": "iPhone 12 Pro",
-                "osVersion": "14",
-                "realMobile": "true"
+                "deviceName": "iPhone 13 Pro",
+                "osVersion": "15",
+                "appiumVersion": "1.22.0"
             },
-            "browserName": "iPhone"
+            "browserName": "ios"
         },
         {
             "bstack:options": {
                 "deviceName": "Samsung Galaxy S22",
-                "osVersion": "12",
-                "realMobile": "true"
+                "osVersion": "12.0"
             },
-            "browserName": "Android"
+            "browserName": "android"
         }
     ]
 };

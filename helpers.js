@@ -10,6 +10,14 @@ export default class Helpers {
         return list[Math.floor((Math.random() * list.length))];
     }
 
+    static async getRandomNumber(min, max) {
+        const difference = max - min;
+        let rand = Math.random();
+        rand = Math.floor( rand * difference);
+        rand = rand + min;
+        return rand;
+    }
+
     static async trimAllNonNumericCharacters(string) {
         const regex = /\D/gi;
         return string.replace(regex, "");

@@ -1,7 +1,10 @@
 exports.config = {
     suites: {
         regression: [
-            "./specs/regression.js"
+            "./specs/regression-search.js",
+            "./specs/regression-home-page.js",
+            "./specs/browse.js",
+            "./specs/add-to-wishlist.js"
         ],
         monitoring: [
             "./specs/add-to-wishlist.js",

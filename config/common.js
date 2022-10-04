@@ -38,7 +38,7 @@ exports.config = {
     updateJob: false,
     exclude: [],
 
-    maxInstances: 20,
+    maxInstances: 50,
 
     logLevel: process.env.LOGLEVEL || "silent",
     outputDir: "./logs/",

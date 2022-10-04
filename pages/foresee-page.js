@@ -1,3 +1,4 @@
+/* global browser */
 import Page from "./page";
 import BrowserActions from "../browser-actions";
 
@@ -7,7 +8,7 @@ export default class ForeseePage extends Page {
     }
 
     async open() {
-        await super.open("#fscommand=fsoptout");
+        await browser.url(this.baseUrl + "/#fscommand=fsoptout");
     }
 
     async checkForCoreComponents() {

@@ -21,7 +21,7 @@ export default class Page {
         this.signInButtonSelector = "//*[@id=\"sign-in\"]/*/button[contains(@alt, \"sign in button\")]";
         this.internationalShippingModalHeader = "h3=We ship internationally";
         this.shippingCountryDropdownSelector = "#dialog-description label > select";
-        this.changeCountryLinkSelector = "a[name='changeCountry']";
+        this.changeCountryLinkSelector = "a[name='changeCountry'] > div";
         this.saveShippingPreferencesButtonSelector = "#dialog-description button";
         this.welcomeModalHeaderSelector = "h3*=We Ship to";
         this.resetShippingCountryLinkSelector = "a=ship to a U.S. address";
@@ -78,7 +78,8 @@ export default class Page {
 
     async signIn(email, password, options = {}) {
         const {
-            navigateToSignInPage = true
+            navigateToSignInPage = true,
+            skipReturnUrl = false
         } = options;
 
         if (navigateToSignInPage) {
@@ -95,15 +96,16 @@ export default class Page {
         await BrowserActions.waitForElementToDisappear(this.nextButtonSelector);
         await BrowserActions.setTextOnElement(this.passwordFieldSelector, password || process.env.PASSWORD);
         await BrowserActions.clickOnElement(this.signInButtonSelector);
-        await BrowserActions.waitForElementToDisappear(this.signInButtonSelector);
-        await browser.refresh();
+        if (!await BrowserActions.isBrowserEdge()) {
+            await BrowserActions.waitForElementToDisappear(this.signInButtonSelector);
+        }
 
         // This is to get around a bug where the returnURL of the sign in link
         // doesn't get set right if the page is navigated to via hard-nav
         // TODO: Remove when the bug is fixed
         // https://jira.nordstrom.com/browse/SBX-3107
 
-        if (!returnUrl) {
+        if (!returnUrl && !skipReturnUrl) {
             await await browser.url(this.originalBrowserPath);
         }
 
@@ -111,7 +113,11 @@ export default class Page {
 
     async changeShippingCountryTo(countryCode) {
         await BrowserActions.scrollToPageBottom();
-        await BrowserActions.clickOnElement(this.changeCountryLinkSelector);
+        if (!await BrowserActions.isBrowserSafari()) {
+            await BrowserActions.clickOnElement(this.changeCountryLinkSelector);
+        } else {
+            await BrowserActions.clickOnElementMobile(this.changeCountryLinkSelector);
+        }
         await BrowserActions.waitForElementToAppear(this.internationalShippingModalHeader);
         await BrowserActions.selectDropdownOptionByValue(this.shippingCountryDropdownSelector, countryCode);
         await BrowserActions.clickOnElement(this.saveShippingPreferencesButtonSelector);
@@ -123,7 +129,11 @@ export default class Page {
 
     async resetShippingCountryToUS() {
         await BrowserActions.scrollToPageBottom();
-        await BrowserActions.clickOnElement(this.changeCountryLinkSelector);
+        if (!await BrowserActions.isBrowserSafari()) {
+            await BrowserActions.clickOnElement(this.changeCountryLinkSelector);
+        } else {
+            await BrowserActions.clickOnElementMobile(this.changeCountryLinkSelector);
+        }
         await BrowserActions.clickOnElement(this.resetShippingCountryLinkSelector);
         await BrowserActions.clickOnElement(this.saveShippingPreferencesButtonSelector);
         await BrowserActions.waitForElementToDisappear(this.internationalShippingModalHeader);
@@ -180,12 +190,29 @@ export default class Page {
         await BrowserActions.pressKeys(["Meta", "Enter"]);
     }
 
+    async enterPartOfSearchTerm(searchTerm) {
+        await BrowserActions.setTextOnElement(this.searchInputSelector, searchTerm);
+    }
+
     async performSearchMobile(searchTerm) {
         if (await BrowserActions.isElementDisplayed(this.searchInputSelectorMobile)) {
             await BrowserActions.clickOnElementMobile(this.searchInputSelectorMobile);
         }
+        const isIPhone = await BrowserActions.isDeviceIPhone();
         await BrowserActions.setTextOnElement(this.searchInputSelector, searchTerm);
-        await BrowserActions.clickOnElementMobile(this.searchSuggestions);
+        await BrowserActions.setTextOnElement(this.searchInputSelector, "\n");
+        if (isIPhone) {
+            await BrowserActions.clickOnElementMobile(this.searchSuggestions);
+        } else {
+            await browser.pressKeyCode(66);
+        }
+    }
+
+    async enterPartOfSearchTermMobile(searchTerm) {
+        if (await BrowserActions.isElementDisplayed(this.searchInputSelectorMobile)) {
+            await BrowserActions.clickOnElementMobile(this.searchInputSelectorMobile);
+        }
+        await BrowserActions.setTextOnElement(this.searchInputSelector, searchTerm);
     }
 
     async clearSearchInput() {
@@ -194,7 +221,7 @@ export default class Page {
 
     async clearSearchInputMobile() {
         await this.openSearchInputMobile();
-        const isIPhone = browser.capabilities.deviceName.includes("iPhone");
+        const isIPhone = await BrowserActions.isDeviceIPhone();
         if (isIPhone) {
             await BrowserActions.touchElementByPoints(327, 88);
             await BrowserActions.clickOnElementMobile(this.clearSearchFormMobile);
@@ -215,6 +242,12 @@ export default class Page {
         return await BrowserActions.getTextFromSelector(this.recentSearches);
     }
 
+    async clickRecentSearchesHead() {
+        browser.refresh();
+        await BrowserActions.clickOnElement(this.searchInputSelector);
+        await BrowserActions.clickOnElement(this.recentSearches);
+    }
+
     async getRecentSearches() {
         await BrowserActions.clickOnElement(this.searchInputSelector);
         return await BrowserActions.getTextFromMultipleSelectors(this.recentSearches);
@@ -223,6 +256,13 @@ export default class Page {
     async getRecentSearchesHeadMobile() {
         await BrowserActions.clickOnElementMobile(this.searchInputSelector);
         return await BrowserActions.getTextFromSelector(this.recentSearchesMobile);
+    }
+
+    async clickRecentSearchesHeadMobile() {
+        if (await BrowserActions.isElementDisplayed(this.searchInputSelectorMobile)) {
+            await BrowserActions.clickOnElementMobile(this.searchInputSelectorMobile);
+        }
+        return await BrowserActions.clickOnElementMobile(this.recentSearchesMobile);
     }
 
     async getRecentSearchesMobile() {

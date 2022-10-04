@@ -26,7 +26,7 @@ const overrides = {
             sessionName: `${site} : ${testName}`,
             debug: process.env.DEBUG || "false",
             video: process.env.DEBUG || "true",
-            networkLogs: process.env.DEBUG || "false",
+            networkLogs: process.env.DEBUG || "true",
             maskCommands: "setValues, getValues, setCookies, getCookies",
             local: "false"
         }
@@ -74,34 +74,40 @@ const overrides = {
             context.testCount--;
         }
 
+        global.browserstackAuth = Buffer.from(`${this.user}:${this.key}`).toString("base64");
+        global.browserstackSession = browser.sessionId;
+        global.browserstackUrl = `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`;
+
         let resultFilename = `${site}_${testName}`;
         const filename = test.file.split("/").pop().replace(".js", "");
         if (!testName.includes(filename)) {
-            await browser.executeScript(
-                `browserstack_executor: ${JSON.stringify({
-                    action: "setSessionName",
-                    arguments: {
-                        name: [site, testName, filename].join(" : ")
-                    }
-                })}`,
-                []
-            );
+            const updateSessionOptions = {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Basic ${global.browserstackAuth}`
+                },
+                body: JSON.stringify({
+                    "name": [site, testName, filename].join(" : ")
+                })
+            };
+
+            const updateSessoinResponse = await fetch(global.browserstackUrl, updateSessionOptions);
+            if (!updateSessoinResponse.ok) {
+                console.log(`Failed to update Browserstack session name. \n ${updateSessoinResponse}`);
+            }
 
             resultFilename = `${site}_${testName}_${filename}`;
         }
 
         // Get browserstack link
-        const auth = Buffer.from(`${this.user}:${this.key}`).toString("base64");
-
-        const options = {
+        const getLinkOptions = {
             "method": "GET",
             "headers": {
-                "Authorization": `Basic ${auth}`
+                "Authorization": `Basic ${global.browserstackAuth}`
             }
         };
-
-        const url = `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`;
-        const response = await fetch(url, options);
+        const response = await fetch(global.browserstackUrl, getLinkOptions);
 
         const bs_session = await response.json();
 
@@ -121,34 +127,36 @@ const overrides = {
     afterTest: async function (testCase, context, { error, passed }) {
         // Mark the status of test on BrowserStack based on the assertion status
         let logResult;
+        let testStatus;
+        let testReason;
+
         if (passed) {
             logResult = 0;
-            await browser.executeScript(
-                `browserstack_executor: ${JSON.stringify({
-                    action: "setSessionStatus",
-                    arguments: {
-                        status: "passed",
-                        reason: "Test passed"
-                    }
-                })}`,
-                []
-            );
+            testStatus = "passed";
+            testReason = "Test passed";
         } else {
             logResult = 1;
-            const reason = error
+            testStatus = "failed";
+            testReason = error
                 .toString()
                 .replace(/[^a-zA-Z0-9.]/g, " ")
                 .substring(0, 255);
-            await browser.executeScript(
-                `browserstack_executor: ${JSON.stringify({
-                    action: "setSessionStatus",
-                    arguments: {
-                        status: "failed",
-                        reason
-                    }
-                })}`,
-                []
-            );
+        }
+
+        const response = await fetch(global.browserstackUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Basic ${global.browserstackAuth}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "status": testStatus,
+                "reason": testReason
+            })
+        });
+
+        if (!response.ok) {
+            console.log(`Failed to log Browserstack status. \n ${response}`);
         }
 
         const data = await fs.readFile(browser.config.custom_report_filename, "utf8");

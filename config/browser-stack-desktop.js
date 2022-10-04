@@ -17,7 +17,7 @@ let overrides = {
                 "osVersion": "10"
             },
             "browserName": "Chrome",
-            "browserVersion": "latest-2"
+            "browserVersion": "latest-1"
         },
         {
             "bstack:options": {
@@ -25,7 +25,7 @@ let overrides = {
                 "osVersion": "Big Sur"
             },
             "browserName": "Chrome",
-            "browserVersion": "latest-2"
+            "browserVersion": "latest-1"
         },
         {
             "bstack:options": {
@@ -43,12 +43,6 @@ let overrides = {
             "browserName": "Firefox",
             "browserVersion": "latest-2"
         },
-        // {
-        //     "browserName": "IE",
-        //     browser_version: "11.0",
-        //     "os": "Windows",
-        //     os_version: "10"
-        // },
         {
             "bstack:options": {
                 "os": "OS X",
@@ -63,8 +57,14 @@ let overrides = {
                 "osVersion": "10"
             },
             "browserName": "Edge",
-            "browserVersion": "latest-2"
+            "browserVersion": "latest-1"
         }
+        // {
+        //     "browserName": "IE",
+        //     browser_version: "11.0",
+        //     "os": "Windows",
+        //     os_version: "10"
+        // },
     ]
 };
 
