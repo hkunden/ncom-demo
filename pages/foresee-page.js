@@ -17,6 +17,6 @@ export default class ForeseePage extends Page {
     }
 
     async clickOnElement() {
-        await BrowserActions.clickOnElement(this.foreseeOptOutButton);
+        await BrowserActions.clickOnElementMobile(this.foreseeOptOutButton);
     }
 }

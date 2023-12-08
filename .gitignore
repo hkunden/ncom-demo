@@ -1,4 +1,13 @@
-node_modules
-reports
-results
-logs
+allure-report/
+allure-results/
+logs/
+node_modules/
+results/
+reports/
+local.log
+errorShots
+browserstack.err
+.DS_Store
+.env
+dired_location
+driver-logs/

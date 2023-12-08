@@ -5,6 +5,7 @@ export default class GuestCheckoutPage extends Page {
     constructor (...args) {
         super(...args);
         this.guestCheckoutButtonSelector = "button=Guest Checkout";
+        this.guestCheckoutButtonSelector1 = "//*[text()='Guest Checkout']";
         this.firstNameFieldSelector = "input[name='firstName']";
         this.lastNameFieldSelector = "input[name='lastName']";
         this.quickAddressFieldSelector = "div=Quickly find your address";
@@ -15,15 +16,26 @@ export default class GuestCheckoutPage extends Page {
         this.postalCodeFieldSelector = "input[name='postalCode']";
         this.quickAddressInputSelector = "input[name='address']";
         this.enterAddressManuallyButtonSelector = "button=Enter address manually";
+        this.soldOutMessage = "//*[@id='sold-out-view']/div/div/div";
     }
 
     async checkoutAsGuest() {
         await BrowserActions.clickOnElement(this.guestCheckoutButtonSelector);
     }
 
+    async clickCheckoutAsGuestMobile() {
+        await BrowserActions.pauseExecution(500);
+        await BrowserActions.clickOnElementMobile(this.guestCheckoutButtonSelector1);
+    }
+
+    async waitForCheckoutAsGuestToAppear() {
+        await BrowserActions.scrollByPx(5, 150);
+        await BrowserActions.waitForElementToAppear(this.guestCheckoutButtonSelector1);
+    }
+
     async fillOutNameAndAddress (firstName, lastName, address1, address2, city, state, postalCode) {
         await BrowserActions.clickOnElement(this.quickAddressFieldSelector);
-        await BrowserActions.setTextOnElement(this.quickAddressInputSelector, "address");
+        await BrowserActions.setTextOnElement(this.quickAddressInputSelector, address1);
         await BrowserActions.pauseExecution(500);
         await BrowserActions.clickOnElement(this.enterAddressManuallyButtonSelector);
         await BrowserActions.setTextOnElement(this.firstNameFieldSelector, firstName);
@@ -33,5 +45,23 @@ export default class GuestCheckoutPage extends Page {
         await BrowserActions.setTextOnElement(this.cityFieldSelector, city);
         await BrowserActions.setTextOnElement(this.stateFieldSelector, state);
         await BrowserActions.setTextOnElement(this.postalCodeFieldSelector, postalCode);
+    }
+
+    async fillOutNameAndAddressMobile(firstName, lastName, address1, address2, city, state, postalCode) {
+        await BrowserActions.clickOnElementMobile(this.quickAddressFieldSelector);
+        await BrowserActions.setTextOnElement(this.quickAddressInputSelector, address1);
+        await BrowserActions.pauseExecution(500);
+        await BrowserActions.clickOnElementMobile(this.enterAddressManuallyButtonSelector);
+        await BrowserActions.setTextOnElement(this.firstNameFieldSelector, firstName);
+        await BrowserActions.setTextOnElement(this.lastNameFieldSelector, lastName);
+        await BrowserActions.setTextOnElement(this.addressLine1FieldSelector, address1);
+        await BrowserActions.setTextOnElement(this.addressLine2FieldSelector, address2);
+        await BrowserActions.setTextOnElement(this.cityFieldSelector, city);
+        await BrowserActions.setTextOnElement(this.stateFieldSelector, state);
+        await BrowserActions.setTextOnElement(this.postalCodeFieldSelector, postalCode);
+    }
+
+    async getSoldOutMessage() {
+        return await BrowserActions.getTextFromMultipleSelectors(this.soldOutMessage);
     }
 }

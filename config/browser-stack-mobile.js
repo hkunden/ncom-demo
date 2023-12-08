@@ -1,29 +1,38 @@
 /* eslint-disable no-console */
 /* globals browser */
 /* eslint-disable camelcase */
+import * as dotenv from "dotenv";
+import * as defaults from "./browser-stack-common.js";
+import * as testSuites from "./mobile-suites.js";
+import _ from 'lodash'
+dotenv.config();
 
-require("dotenv").config();
-
-const defaults = require("./browser-stack-common.js");
-const testSuites = require("./mobile-suites.js");
-const _ = require("lodash");
-
+// Latest-1
 let overrides = {
     capabilities: [
         {
             "bstack:options": {
                 "deviceName": "iPhone 13 Pro",
                 "osVersion": "15",
-                "appiumVersion": "1.22.0"
+                "os": "ios"
             },
-            "browserName": "ios"
+            "browserName": "safari"
+        },
+        {
+            'bstack:options': {
+              "deviceName": "Samsung Galaxy S22 Ultra",
+              "osVersion": "12.0",
+              "os": "android"
+            },
+            "browserName": "samsung"
         },
         {
             "bstack:options": {
-                "deviceName": "Samsung Galaxy S22",
-                "osVersion": "12.0"
+              "deviceName": "Google Pixel 6 Pro",
+              "osVersion": "13.0",
+              "os": "android"
             },
-            "browserName": "android"
+            "browserName": "chrome",
         }
     ]
 };

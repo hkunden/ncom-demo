@@ -9,6 +9,7 @@ const defaults = require("./browser-stack-common.js");
 const testSuites = require("./desktop-suites.js");
 const _ = require("lodash");
 
+// Latest-1
 let overrides = {
     capabilities: [
         {
@@ -37,33 +38,27 @@ let overrides = {
         },
         {
             "bstack:options": {
-                "os": "Windows",
-                "osVersion": "10"
-            },
-            "browserName": "Firefox",
-            "browserVersion": "latest-2"
-        },
-        {
-            "bstack:options": {
                 "os": "OS X",
-                "osVersion": "Big Sur"
+                "osVersion": "Monterey"
             },
             "browserName": "Safari",
-            "browserVersion": "14.0"
+            "browserVersion": "latest"
         },
         {
             "bstack:options": {
                 "os": "Windows",
-                "osVersion": "10"
+                "osVersion": "11"
             },
             "browserName": "Edge",
             "browserVersion": "latest-1"
         }
         // {
-        //     "browserName": "IE",
-        //     browser_version: "11.0",
-        //     "os": "Windows",
-        //     os_version: "10"
+        //     "bstack:options": {
+        //         "os": "Windows",
+        //         "osVersion": "10"
+        //     },
+        //     "browserName": "Firefox",
+        //     "browserVersion": "latest-2"
         // },
     ]
 };

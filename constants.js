@@ -12,5 +12,6 @@ export const INTERNET_EXPLORER = "internet explorer";
 export const LONG_WAIT_TIME_MS = 30000;
 export const SAFARI = "safari";
 export const IPHONE = "iphone";
+export const GALAXY = "android";
 export const STANDARD_UI_WAIT_TIME_MS = 4000;
 export const STANDARD_WAIT_TIME_MS = 6000;

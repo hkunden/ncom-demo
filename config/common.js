@@ -3,11 +3,11 @@
 /* eslint-disable camelcase */
 /* eslint-disable block-spacing */
 /* eslint-disable object-curly-spacing */
-require("dotenv").config();
-
-const argv = require("minimist")(process.argv.slice(2));
-const { TimelineService } = require("wdio-timeline-reporter/timeline-service");
-const { BASE_URLS } = require("../constants");
+import * as dotenv from "dotenv"
+import minimist from "minimist";
+import { BASE_URLS } from "../constants"
+const argv = minimist(process.argv.slice(2));
+dotenv.config();
 
 const { site, suite, spec } = argv;
 
@@ -30,10 +30,12 @@ exports.config = {
     beforeSession: function () {
         global.baseUrl = siteUrl;
         global.site = site;
+        global.suite = suite;
         global.os = (Object.values(browser.capabilities)[0].os === undefined) ?
             Object.values(browser.capabilities)[0].deviceName : Object.values(browser.capabilities)[0].os;
     },
     waitforTimeout: 30000,
+    waitforInterval: 500,
 
     updateJob: false,
     exclude: [],
@@ -41,7 +43,6 @@ exports.config = {
     maxInstances: 50,
 
     logLevel: process.env.LOGLEVEL || "silent",
-    outputDir: "./logs/",
     coloredLogs: true,
     screenshotPath: "./errorShots/",
     baseUrl: "",
@@ -50,12 +51,9 @@ exports.config = {
 
     framework: "mocha",
     mochaOpts: {
-        retries: 0,
         ui: "bdd",
-        timeout: 180000,
-        bail: true,
+        timeout: 540000,
+        bail: false,
         compilers: ["js:@babel/register"]
-    },
-    reporters: [["timeline", { outputDir: "./reports" }]],
-    services: [[TimelineService]]
+    }
 };

@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
-import Homepage from "../pages/homepage";
-import MyAccountPage from "../pages/my-account-page";
-import OrderDetailsPage from "../pages/order-details-page";
+import Homepage from "../../../pages/homepage";
+import MyAccountPage from "../../../pages/my-account-page";
+import OrderDetailsPage from "../../../pages/order-details-page";
 
 const homepage = new Homepage(global.baseUrl);
 const myAccountPage = new MyAccountPage(global.baseUrl);
